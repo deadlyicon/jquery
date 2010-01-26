@@ -608,7 +608,7 @@ test("toggle(Function, Function, ...)", function() {
 });
 
 test(".live()/.die()", function() {
-	expect(61);
+	expect(62);
 
 	var submit = 0, div = 0, livea = 0, liveb = 0;
 
@@ -855,6 +855,12 @@ test(".live()/.die()", function() {
 	equals( livee, 1, "Click, deep selector." );
 
 	jQuery("#nothiddendiv div").die("click");
+
+	// Works with context
+	var ul = jQuery('#live-gt-star-test')[0], clicked = 0;
+	jQuery("> *",ul).live('click', function(){ clicked += 1; });
+	jQuery('#live-gt-star-test li').trigger('click');
+	equals( clicked, 1, "Verify that '> *' selector works with context" );
 });
 
 test("live with change", function(){
