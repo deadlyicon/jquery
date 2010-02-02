@@ -1126,14 +1126,18 @@ test("live with submit", function() {
 });
 
 test(".delegate()/.undelegate()", function() {
-	expect(65);
+	expect(81);
 
-	var submit = 0, div = 0, livea = 0, liveb = 0;
+	var submit = div = livea = liveb = livec = lived = 0;
 
 	jQuery("#body").delegate("div", "submit", function(){ submit++; return false; });
 	jQuery("#body").delegate("div", "click", function(){ div++; });
 	jQuery("#body").delegate("div#nothiddendiv", "click", function(){ livea++; });
 	jQuery("#body").delegate("div#nothiddendivchild", "click", function(){ liveb++; });
+	jQuery("#body").delegate("div#nothiddendivchild", {
+	  click: function(){ livec++; },
+	  'click hover': function(){ lived++; }
+	});
 
 	// Nothing should trigger on the body
 	jQuery("body").trigger("click");
@@ -1141,6 +1145,8 @@ test(".delegate()/.undelegate()", function() {
 	equals( div, 0, "Click on body" );
 	equals( livea, 0, "Click on body" );
 	equals( liveb, 0, "Click on body" );
+	equals( livec, 0, "Click on body" );
+	equals( lived, 0, "Click on body" );
 
 	// This should trigger two events
 	jQuery("div#nothiddendiv").trigger("click");
@@ -1148,6 +1154,8 @@ test(".delegate()/.undelegate()", function() {
 	equals( div, 1, "Click on div" );
 	equals( livea, 1, "Click on div" );
 	equals( liveb, 0, "Click on div" );
+	equals( livec, 0, "Click on body" );
+	equals( lived, 0, "Click on body" );
 
 	// This should trigger three events (w/ bubbling)
 	jQuery("div#nothiddendivchild").trigger("click");
@@ -1155,6 +1163,8 @@ test(".delegate()/.undelegate()", function() {
 	equals( div, 2, "Click on inner div" );
 	equals( livea, 2, "Click on inner div" );
 	equals( liveb, 1, "Click on inner div" );
+	equals( livec, 1, "Click on body" );
+	equals( lived, 1, "Click on body" );
 
 	// This should trigger one submit
 	jQuery("div#nothiddendivchild").trigger("submit");
@@ -1162,6 +1172,8 @@ test(".delegate()/.undelegate()", function() {
 	equals( div, 2, "Submit on div" );
 	equals( livea, 2, "Submit on div" );
 	equals( liveb, 1, "Submit on div" );
+	equals( livec, 1, "Click on body" );
+	equals( lived, 1, "Click on body" );
 
 	// Make sure no other events were removed in the process
 	jQuery("div#nothiddendivchild").trigger("click");
@@ -1169,6 +1181,8 @@ test(".delegate()/.undelegate()", function() {
 	equals( div, 3, "undelegate Click on inner div" );
 	equals( livea, 3, "undelegate Click on inner div" );
 	equals( liveb, 2, "undelegate Click on inner div" );
+	equals( livec, 2, "undelegate Click on inner div" );
+	equals( lived, 2, "undelegate Click on inner div" );
 
 	// Now make sure that the removal works
 	jQuery("#body").undelegate("div#nothiddendivchild", "click");
@@ -1177,6 +1191,8 @@ test(".delegate()/.undelegate()", function() {
 	equals( div, 4, "undelegate Click on inner div" );
 	equals( livea, 4, "undelegate Click on inner div" );
 	equals( liveb, 2, "undelegate Click on inner div" );
+	equals( livec, 2, "undelegate Click on inner div" );
+	equals( lived, 2, "undelegate Click on inner div" );
 
 	// Make sure that the click wasn't removed too early
 	jQuery("div#nothiddendiv").trigger("click");
@@ -1184,6 +1200,8 @@ test(".delegate()/.undelegate()", function() {
 	equals( div, 5, "undelegate Click on inner div" );
 	equals( livea, 5, "undelegate Click on inner div" );
 	equals( liveb, 2, "undelegate Click on inner div" );
+	equals( livec, 2, "undelegate Click on inner div" );
+	equals( lived, 2, "undelegate Click on inner div" );
 
 	// Make sure that stopPropgation doesn't stop live events
 	jQuery("#body").delegate("div#nothiddendivchild", "click", function(e){ liveb++; e.stopPropagation(); });
@@ -1192,6 +1210,8 @@ test(".delegate()/.undelegate()", function() {
 	equals( div, 6, "stopPropagation Click on inner div" );
 	equals( livea, 6, "stopPropagation Click on inner div" );
 	equals( liveb, 3, "stopPropagation Click on inner div" );
+	equals( livec, 2, "stopPropagation Click on inner div" );
+	equals( lived, 2, "stopPropagation Click on inner div" );
 
 	// Make sure click events only fire with primary click
 	var event = jQuery.Event("click");

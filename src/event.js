@@ -868,7 +868,12 @@ jQuery.fn.extend({
 	},
 	
 	delegate: function( selector, types, data, fn ) {
-		return this.live( types, data, fn, selector );
+		if (jQuery.isPlainObject(types)){
+			for (var type in types) this.live( type, undefined, types[type], selector );
+		}else{
+			this.live( types, data, fn, selector );
+		}
+		return this;
 	},
 	
 	undelegate: function( selector, types, fn ) {
